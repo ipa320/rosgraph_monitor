@@ -1,4 +1,0 @@
-RosSystem { Name 'talker_listener_system' 
-RosComponents ( 
-    ComponentInterface { name 'listener' RosSubscribers { RosSubscriber 'chatter' { RefSubscriber 'rospy_tutorials.listener.listener.chatter' } } } , 
-    ComponentInterface { name 'talker' RosPublishers { RosPublisher 'chatter' { RefPublisher 'rospy_tutorials.talker.talker.chatter' } } } ) }
