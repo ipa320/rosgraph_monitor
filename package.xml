@@ -6,19 +6,20 @@
   <name>rosgraph_monitor</name>
   <version>0.0.1</version>
   <description>ROS graph monitor</description>
-
   <author email="hsd@ipa.fraunhofer.de">Harsh Deshpande</author>
   <maintainer email="hsd@ipa.fraunhofer.de">Harsh Deshpande</maintainer>
   <license>Apache 2.0</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  
-  <exec_depend>controller_manager_msgs</exec_depend>
+  <exec_depend>rclpy</exec_depend>
   <exec_depend>diagnostic_msgs</exec_depend>
-  <exec_depend>ros_model_parser</exec_depend>
-  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-rospkg</exec_depend>
-  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-rospkg</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
 
   <export>
+    <build_type>ament_python</build_type>
   </export>
+
 </package>
