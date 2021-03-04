@@ -68,7 +68,11 @@ def main(args=None) -> None:
     
     observer = Observer("Dummy")
     observer.start()
-    rclpy.spin(observer)
+    try:
+        rclpy.spin(observer)
+    except KeyboardInterrupt:
+        observer.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
