@@ -10,7 +10,7 @@ import os.path
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
-BLACK_LIST_PARAM = ['/rosdistro', '/rosversion', '/run_id','robot_description','/docker_control/stations','/docking_laser_filter/scan_filter_chain','/bms/diagnostics','/station_detector/stations','/scan_unifier_filter/scan_filter_chain']
+BLACK_LIST_PARAM = ['/rosdistro', '/rosversion', '/run_id']
 BLACK_LIST_TOPIC = ["/tf", "/tf_static", "/rosout", "/clock"]
 BLACK_LIST_SERV = ["/set_logger_level", "/get_loggers"]
 BLACK_LIST_NODE = ["/rosout"]
@@ -21,6 +21,11 @@ ACTION_FILTER2 = ['status', 'result', 'feedback']
 def strip_slash(string):
     return '{}'.format(string[1:] if string.startswith('/') else string)
 
+def check_black_list(name, black_list):
+    for bl_ in black_list:
+        if bl_ in name:
+            return False
+    return True
 
 def init_node_dict(nodes, name):
     nodes[name] = {'publishers' : dict(),
