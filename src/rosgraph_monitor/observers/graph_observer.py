@@ -1,17 +1,13 @@
-import imp
 from rosgraph_monitor.observer import Observer, ServiceObserver
-import ros_graph_parser.core_class as rg
 from ros_model_parser.rossystem_parser import RosSystemModelParser
 from ros_model_generator.rossystem_generator import RosSystemModelGenerator
-from pyparsing import *
 import rosgraph
 import rosparam
-import rosservice
 import rospkg
+import rosservice
+import imp
 import os.path
-import re
 
-from ros_graph_parser.srv import GetROSModel, GetROSSystemModel
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 BLACK_LIST_PARAM = ['/rosdistro', '/rosversion', '/run_id','robot_description','/docker_control/stations','/docking_laser_filter/scan_filter_chain','/bms/diagnostics','/station_detector/stations','/scan_unifier_filter/scan_filter_chain']
