@@ -1,4 +1,4 @@
-from rosgraph_monitor.observer import Observer, ServiceObserver
+from rosgraph_monitor.observer import Observer
 from ros_model_parser.rossystem_parser import RosSystemModelParser
 from ros_model_generator.rossystem_generator import RosSystemModelGenerator
 import rosgraph
@@ -143,23 +143,26 @@ def create_ros_graph_snapshot():
     return components
 
 
-class ROSGraphObserver(ServiceObserver):
+class ROSGraphObserver(Observer):
     def __init__(self, name):
-        super(ROSGraphObserver, self).__init__(
-            name, '/get_rossystem_model', GetROSSystemModel)
+        super(ROSGraphObserver, self).__init__(name)
         rospack = rospkg.RosPack()
         # TODO: path to model shouldn't be hardcoded
-        self.model_path = os.path.join(rospack.get_path('rosgraph_monitor'), "resources/cob4-25.rossystem")
-        self._rossystem_parser = ModelParser(self.model_path)
+        model_path = os.path.join(rospack.get_path('rosgraph_monitor'), "resources/cob4-25.rossystem")
+        self.static_model = RosSystemModelParser(model_path).parse()
+        self.generator = RosSystemModelGenerator('demo')
 
-    def diagnostics_from_response(self, resp):
+    def generate_diagnostics(self):
         status_msgs = list()
-        if resp is None:
-            return status_msgs
 
-        parser = ModelParser(resp.model, isFile=False)
-        dynamic_model = parser.parse()
-        static_model = self._rossystem_parser.parse()
+        components = create_ros_graph_snapshot()
+        try:
+            model_str = self.generator.create_ros_system_model_list(components)
+            dynamic_model = RosSystemModelParser(model_str, isFile=False).parse()
+            print(dynamic_model)
+        except Exception as e:
+            print(e.args)
+            return status_msgs
 
         missing_interfaces, additional_interfaces, incorrect_params = self.compare_models(
             static_model, dynamic_model)
