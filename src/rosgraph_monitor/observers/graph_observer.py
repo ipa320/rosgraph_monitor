@@ -35,6 +35,113 @@ def init_node_dict(nodes, name):
                    'action_servers' :dict(),
                    'action_clients' : dict() }
 
+def check_actions(publishers, subscribers, action_clients, action_servers):
+        pubs_ = [pub for pub in publishers.keys()]
+        subs_ = [sub for sub in subscribers.keys()]
+
+        remove_pubs = list()
+        remove_subs = list()
+
+        # Check Action client
+        for topic_name, topic_type in publishers.items():
+            if topic_name.endswith(ACTION_FILTER[0]):
+                _action_name = topic_name[:-len(ACTION_FILTER[0]) - 1]
+                cancel_topic = _action_name + '/' + ACTION_FILTER[1]
+                if not (cancel_topic in pubs_):
+                    continue
+                remove_pubs.append(topic_name)
+                remove_pubs.append(cancel_topic)
+                for name in ACTION_FILTER2:
+                    topic = _action_name + '/' + name
+                    if not (topic in subs_):
+                        continue
+                    remove_subs.append(topic)
+                _action_type = topic_type[:-10]  # Hardcoded ActionGoal
+                action_clients.add((_action_name, _action_type))
+
+        # Check Action Server
+        for topic_name, topic_type in subscribers.items():
+            if topic_name.endswith(ACTION_FILTER[0]):
+                _action_name = topic_name[:-len(ACTION_FILTER[0]) - 1]
+                cancel_topic = _action_name + '/' + ACTION_FILTER[1]
+                if not (cancel_topic in subs_):
+                    continue
+                remove_subs.append(topic_name)
+                remove_subs.append(cancel_topic)
+                for name in ACTION_FILTER2:
+                    topic = _action_name + '/' + name
+                    if not (topic in pubs_):
+                        continue
+                    remove_pubs.append(topic)
+                _action_type = topic_type[:-10]  # Hardcode ActionGoal
+                action_servers[_action_name] = _action_type
+
+        for topic in remove_pubs:
+            publishers.pop(topic)
+        for topic in remove_subs:
+            subscribers.pop(topic)
+
+def create_ros_graph_snapshot():
+    master = rosgraph.Master('snapshot')
+    params = list()
+    topics_dict = dict()
+
+    if not(master.is_online()):
+        print("Error: ROSMaster not found")
+        return list()
+
+    # Get parameters
+    for param_name in master.getParamNames():
+        if param_name not in BLACK_LIST_PARAM and not(param_name.startswith('/roslaunch')):
+            params.append(param_name)
+    state = master.getSystemState() #get the system state
+    pubs, subs, services = state
+
+    #get all topics type
+    topic_list = master.getTopicTypes()
+    for topic, topic_type in topic_list:
+        topics_dict[topic] = topic_type
+
+    components = dict()
+    for pub, nodes in pubs:
+        if not check_black_list(pub, BLACK_LIST_TOPIC):
+            continue
+        for node in nodes:
+            if not check_black_list(node, BLACK_LIST_NODE):
+                continue
+            if node not in components:
+                init_node_dict(components, node)
+            components[node]['publishers'][pub] = topics_dict[pub]
+
+    for sub, nodes in subs:
+        if not check_black_list(sub, BLACK_LIST_TOPIC):
+            continue
+        for node in nodes:
+            if not check_black_list(node, BLACK_LIST_NODE):
+                continue
+            if node not in components:
+                init_node_dict(components, node)
+            components[node]['subscribers'][sub] = topics_dict[sub]
+
+    for serv, nodes in services:
+        if not check_black_list(serv, BLACK_LIST_SERV):
+            continue
+        for node in nodes:
+            if not check_black_list(node, BLACK_LIST_NODE):
+                continue
+            if node not in components:
+                init_node_dict(components, node)
+            components[node]['service_servers'][serv] = rosservice.get_service_type(serv)
+
+    for name in components:
+        publishers = components[name]['publishers']
+        subscribers = components[name]['subscribers']
+        action_clients = components[name]['action_clients']
+        action_servers = components[name]['action_servers']
+        check_actions(publishers, subscribers, action_clients, action_servers)
+
+    return components
+
 
 class ROSGraphObserver(ServiceObserver):
     def __init__(self, name):
@@ -143,98 +250,3 @@ class ROSGraphObserver(ServiceObserver):
 
         # returning missing_interfaces, additional_interfaces
         return list(set_ref - set_current), list(set_current - set_ref), incorrect_params
-
-    def check_actions(self, publishers, subscribers, action_clients, action_servers):
-        pubs_ = [pub for pub in publishers.keys()]
-        subs_ = [sub for sub in subscribers.keys()]
-
-        remove_pubs = list()
-        remove_subs = list()
-
-        # Check Action client
-        for topic_name, topic_type in publishers.items():
-            if topic_name.endswith(ACTION_FILTER[0]):
-                _action_name = topic_name[:-len(ACTION_FILTER[0]) - 1]
-                cancel_topic = _action_name + '/' + ACTION_FILTER[1]
-                if not (cancel_topic in pubs_):
-                    continue
-                remove_pubs.append(topic_name)
-                remove_pubs.append(cancel_topic)
-                for name in ACTION_FILTER2:
-                    topic = _action_name + '/' + name
-                    if not (topic in subs_):
-                        continue
-                    remove_subs.append(topic)
-                _action_type = topic_type[:-10]  # Hardcoded ActionGoal
-                action_clients.add((_action_name, _action_type))
-
-        # Check Action Server
-        for topic_name, topic_type in subscribers.items():
-            if topic_name.endswith(ACTION_FILTER[0]):
-                _action_name = topic_name[:-len(ACTION_FILTER[0]) - 1]
-                cancel_topic = _action_name + '/' + ACTION_FILTER[1]
-                if not (cancel_topic in subs_):
-                    continue
-                remove_subs.append(topic_name)
-                remove_subs.append(cancel_topic)
-                for name in ACTION_FILTER2:
-                    topic = _action_name + '/' + name
-                    if not (topic in pubs_):
-                        continue
-                    remove_pubs.append(topic)
-                _action_type = topic_type[:-10]  # Hardcode ActionGoal
-                action_servers[_action_name] = _action_type
-
-        for topic in remove_pubs:
-            publishers.pop(topic)
-        for topic in remove_subs:
-            subscribers.pop(topic)
-
-    def create_ros_graph_snapshot(self):
-        master = rosgraph.Master('snapshot')
-        params = list()
-        topics_dict = dict()
-
-        if not(master.is_online()):
-            print("Error: ROSMaster not found")
-            return list()
-
-        # Get parameters
-        for param_name in master.getParamNames():
-            if param_name not in BLACK_LIST_PARAM and not(param_name.startswith('/roslaunch')):
-                params.append(param_name)
-        state = master.getSystemState() #get the system state
-        pubs, subs, services = state
-
-        #get all topics type
-        topic_list = master.getTopicTypes()
-        for topic, topic_type in topic_list:
-            topics_dict[topic] = topic_type
- 
-        components = dict()
-        for pub, nodes in pubs:
-            for node in nodes:
-                if node not in components:
-                    init_node_dict(components, node)
-                components[node]['publishers'][pub] = topics_dict[pub]
-
-        for sub, nodes in subs:
-            for node in nodes:
-                if node not in components:
-                    init_node_dict(components, node)
-                components[node]['subscribers'][sub] = topics_dict[sub]
-        
-        for serv, nodes in services:
-            for node in nodes:
-                if node not in components:
-                    init_node_dict(components, node)
-                components[node]['service_servers'][serv] = rosservice.get_service_type(serv)
-
-        for name in components:
-            publishers = components[name]['publishers']
-            subscribers = components[name]['subscribers']
-            action_clients = components[name]['action_clients']
-            action_servers = components[name]['action_servers']
-            self.check_actions(publishers, subscribers, action_clients, action_servers)
-
-        return components
