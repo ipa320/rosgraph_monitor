@@ -157,15 +157,14 @@ class ROSGraphObserver(Observer):
 
         components = create_ros_graph_snapshot()
         try:
-            model_str = self.generator.create_ros_system_model_list(components)
+            model_str = self.generator.create_ros_system_model_list(components)[1]
             dynamic_model = RosSystemModelParser(model_str, isFile=False).parse()
-            print(dynamic_model)
         except Exception as e:
             print(e.args)
             return status_msgs
 
         missing_interfaces, additional_interfaces, incorrect_params = self.compare_models(
-            static_model, dynamic_model)
+            self.static_model, dynamic_model)
 
         status_msgs = list()
         if (not missing_interfaces) & (not additional_interfaces) & (not incorrect_params):
