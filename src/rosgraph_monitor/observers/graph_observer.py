@@ -7,6 +7,7 @@ import rospkg
 import rosservice
 import imp
 import os.path
+from re import compile
 
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
@@ -28,7 +29,8 @@ def check_black_list(name, black_list):
     return True
 
 def init_node_dict(nodes, name):
-    nodes[name] = {'publishers' : dict(),
+    nodes[name] = {'parameters' : dict(),
+                   'publishers' : dict(),
                    'subscribers' : dict(),
                    'service_servers' : dict(),
                    'service_clients' :dict(),
@@ -90,10 +92,6 @@ def create_ros_graph_snapshot():
         print("Error: ROSMaster not found")
         return list()
 
-    # Get parameters
-    for param_name in master.getParamNames():
-        if param_name not in BLACK_LIST_PARAM and not(param_name.startswith('/roslaunch')):
-            params.append(param_name)
     state = master.getSystemState() #get the system state
     pubs, subs, services = state
 
@@ -139,6 +137,29 @@ def create_ros_graph_snapshot():
         action_clients = components[name]['action_clients']
         action_servers = components[name]['action_servers']
         check_actions(publishers, subscribers, action_clients, action_servers)
+
+    # Get parameters
+    params = master.getParamNames()
+    component_names = list(components.keys())
+    for name in component_names:
+        r = compile(name + "*")
+        # Python2.x: param_node_ns = filter(r.match, params)
+        param_node_ns = list(filter(r.match, params))
+        # remove the params which belong to the node's namespace from the list
+        # the params that remain at the end of the loop are global params
+        g_params = [param for param in params if param not in param_node_ns]
+        params = g_params
+        for param in param_node_ns:
+            if param not in BLACK_LIST_PARAM and not(param.startswith('/roslaunch')):
+                p = master.getParam(param)
+                components[node]['parameters'][param] = [p, type(p)]
+    # the remaining params are global params
+    if len(params) > 0:
+        init_node_dict(components, 'parameters_node')
+        for param in params:
+            if param not in BLACK_LIST_PARAM and not(param.startswith('/roslaunch')):
+                p = master.getParam(param)
+                components['parameters_node']['parameters'][param] = [p, type(p)]
 
     return components
 
