@@ -155,11 +155,11 @@ def create_ros_graph_snapshot():
                 components[node]['parameters'][param] = [p, type(p)]
     # the remaining params are global params
     if len(params) > 0:
-        init_node_dict(components, 'parameters_node')
+        components['global_parameters'] = dict()
         for param in params:
             if param not in BLACK_LIST_PARAM and not(param.startswith('/roslaunch')):
                 p = master.getParam(param)
-                components['parameters_node']['parameters'][param] = [p, type(p)]
+                components['global_parameters'][param] = [p, type(p)]
 
     return components
 
