@@ -9,7 +9,13 @@ catkin_python_setup()
 
 catkin_package()
 
-install(DIRECTORY launch
-   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# INSTALL
+catkin_install_python(PROGRAMS 
+  scripts/monitor
+  scripts/rossystem_snapshot
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(DIRECTORY resources
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
