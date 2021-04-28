@@ -18,5 +18,5 @@ def generate_model_from_snapshot():
         print(e.args)
 
 if __name__ == "__main__":
-    rospy.init_node('dummy_node')
+    rospy.init_node('rossystem_from_snapshot_generator')
     generate_model_from_snapshot()
