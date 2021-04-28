@@ -4,5 +4,5 @@
     version: master
 - git:
     local-name: rosgraph_monitor
-    uri: https://github.com/ipa-hsd/rosgraph_monitor.git
-    version: ros_model_parser
+    uri: https://github.com/ipa320/rosgraph_monitor.git
+    version: main
