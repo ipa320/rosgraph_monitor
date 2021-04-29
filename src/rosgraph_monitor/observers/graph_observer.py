@@ -4,6 +4,7 @@ from ros_model_generator.rossystem_generator import RosSystemModelGenerator
 import rosgraph
 import rosparam
 import rospkg
+import rospy
 import rosservice
 import imp
 import os.path
@@ -168,8 +169,9 @@ class ROSGraphObserver(Observer):
     def __init__(self, name):
         super(ROSGraphObserver, self).__init__(name)
         rospack = rospkg.RosPack()
-        # TODO: path to model shouldn't be hardcoded
-        model_path = os.path.join(rospack.get_path('rosgraph_monitor'), "resources/cob4-25.rossystem")
+        if not rospy.has_param('~desired_rossystem'):
+            raise KeyError("Private parameter 'desired_rossystem' not set")
+        model_path = rospy.get_param('~desired_rossystem')
         self.static_model = RosSystemModelParser(model_path).parse()
         self.generator = RosSystemModelGenerator('demo')
 
