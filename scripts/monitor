@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import importlib
 import time
 import inspect
@@ -100,5 +101,8 @@ if __name__ == "__main__":
 
     if len(args.load) > 0:
         for obs in args.load:
+            if not obs.endswith('Observer'):
+                continue
             manager.start_observer(obs)
+
     rospy.spin()
