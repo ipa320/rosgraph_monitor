@@ -1,5 +1,5 @@
 import threading
-import mutex
+# import mutex
 import rospy
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 
