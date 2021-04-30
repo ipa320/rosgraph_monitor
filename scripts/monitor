@@ -87,7 +87,18 @@ class ModuleManager(object):
 if __name__ == "__main__":
     rospy.init_node('graph_monitor')
 
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument('--load',
+                        nargs='+',
+                        type=str,
+                        default="",
+                        help='Load observers at startup')
+    args = parser.parse_args()
+
     manager = ModuleManager()
     manager.load_observers()
 
+    if len(args.load) > 0:
+        for obs in args.load:
+            manager.start_observer(obs)
     rospy.spin()
