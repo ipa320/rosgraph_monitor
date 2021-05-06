@@ -35,7 +35,11 @@ To dump the `rossystem` model of the running system started above in Terminal 1 
 # Terminal 2:
 rosrun rosgraph_monitor rossystem_snapshot
 ```
-
+Observers can now be loaded at startup. Below is an example to load `ROSGraphObserver` and `DummyObserver`. `ROSGraphObserver` also needs an additional private parameter `_desired_rossystem` with absolute path of `rossystem` file.
+```
+# Terminal 2:
+rosrun rosgraph_monitor monitor --load ROSGraphObserver DummyObserver _desired_rossystem:=<path/to/file>test.rossystem
+```
 
 ### Property observer
 To use a custom created property observer in the module `observers` (e.g. `QualityObserver`)
