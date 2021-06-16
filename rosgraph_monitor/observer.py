@@ -5,9 +5,11 @@ import rclpy
 from rclpy.qos import QoSProfile, HistoryPolicy
 from rclpy.node import Node
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
+from std_msgs.msg import Int32
 from message_filters import ApproximateTimeSynchronizer, Subscriber
 
 # TODO: not sure if it should extend Node
+# Meaning, does every observer has to be a separate node?
 class Observer(Node):
     def __init__(self, name, 
                 qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST),
@@ -93,7 +95,8 @@ class TopicObserver(Observer):
 def main(args=None) -> None:
     rclpy.init(args=args)
     
-    observer = Observer("Dummy")
+    topics = [("/speed", Int32), ("/accel", Int32)]
+    observer = TopicObserver("Dummy", topics)
     observer.start()
     try:
         rclpy.spin(observer)
