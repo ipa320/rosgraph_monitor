@@ -4,9 +4,11 @@ import typing as t
 import rclpy
 from rclpy.qos import QoSProfile, HistoryPolicy
 from rclpy.node import Node
+from rclpy.task import Future
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 from std_msgs.msg import Int32
 from message_filters import ApproximateTimeSynchronizer, Subscriber
+
 
 # TODO: not sure if it should extend Node
 # Meaning, does every observer has to be a separate node?
@@ -81,15 +83,34 @@ class TopicObserver(Observer):
             queue_size=5,
             slop=5,
             allow_headerless=True)
-        topic_synchronizer.registerCallback(self.callback)
+        topic_synchronizer.registerCallback(self.generate_diagnostics)
 
-    def callback(self, msg1, msg2):
-        print(str(msg1) + " " + str(msg2))
+    # Example -- Every TopicObserver has to implement this function in a similar fashion
+    def calculate_attr(self, future, msg1, msg2):
+        res = msg1.data + msg2.data     # custom logic
 
-    def generate_diagnostics(self) -> t.List[DiagnosticStatus]:
-        msg = []
-        msg.append(DiagnosticStatus())
-        return msg
+        status_msg = DiagnosticStatus()
+        status_msg.level = DiagnosticStatus.OK
+        status_msg.name = "Dummy Node"
+        status_msg.message = "QA status"
+
+        future.set_result(status_msg)
+
+    def publish_diagnostics(self, status_msgs: t.List[DiagnosticStatus]):
+        diag_msg = DiagnosticArray()
+
+        diag_msg.status = status_msgs
+
+        diag_msg.header.stamp = self._clock.now().to_msg()
+        self._pub_diag.publish(diag_msg)
+
+    def generate_diagnostics(self, *msgs) -> t.List[DiagnosticStatus]:
+        future = Future()
+
+        self.calculate_attr(future, *msgs)
+        status_msgs = [future.result()]
+        self.publish_diagnostics(status_msgs)
+
 
 # TODO: delete later -- for test only
 def main(args=None) -> None:
@@ -97,7 +118,7 @@ def main(args=None) -> None:
     
     topics = [("/speed", Int32), ("/accel", Int32)]
     observer = TopicObserver("Dummy", topics)
-    observer.start()
+
     try:
         rclpy.spin(observer)
     except KeyboardInterrupt:
