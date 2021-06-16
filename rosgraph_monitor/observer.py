@@ -78,8 +78,8 @@ class TopicObserver(Observer):
             subscribers.append(sub)
         topic_synchronizer = ApproximateTimeSynchronizer(
             subscribers,
-            5,  # queue size
-            0.2,  # time
+            queue_size=5,
+            slop=5,
             allow_headerless=True)
         topic_synchronizer.registerCallback(self.callback)
 
