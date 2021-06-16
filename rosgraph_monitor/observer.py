@@ -96,20 +96,18 @@ class TopicObserver(Observer):
 
         future.set_result(status_msg)
 
-    def publish_diagnostics(self, status_msgs: t.List[DiagnosticStatus]):
+    def publish_diagnostics(self, status_msg: DiagnosticStatus):
         diag_msg = DiagnosticArray()
 
-        diag_msg.status = status_msgs
+        diag_msg.status = [status_msg]
 
         diag_msg.header.stamp = self._clock.now().to_msg()
         self._pub_diag.publish(diag_msg)
 
     def generate_diagnostics(self, *msgs) -> t.List[DiagnosticStatus]:
         future = Future()
-
+        future.add_done_callback(lambda future : self.publish_diagnostics(future.result()))
         self.calculate_attr(future, *msgs)
-        status_msgs = [future.result()]
-        self.publish_diagnostics(status_msgs)
 
 
 # TODO: delete later -- for test only
