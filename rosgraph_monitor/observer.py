@@ -109,6 +109,9 @@ class TopicObserver(Observer):
         future.add_done_callback(lambda future : self.publish_diagnostics(future.result()))
         self.calculate_attr(future, *msgs)
 
+    def start(self) -> None:
+        self._logger.info("starting {}...".format(self.get_name()))
+
 
 # TODO: delete later -- for test only
 def main(args=None) -> None:
