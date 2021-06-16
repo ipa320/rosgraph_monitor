@@ -5,6 +5,7 @@ import rclpy
 from rclpy.qos import QoSProfile, HistoryPolicy
 from rclpy.node import Node
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
+from message_filters import ApproximateTimeSynchronizer, Subscriber
 
 # TODO: not sure if it should extend Node
 class Observer(Node):
@@ -61,6 +62,32 @@ class Observer(Node):
         isSet = self._stop_event.isSet()
         self._lock.release()
         return isSet
+
+
+class TopicObserver(Observer):
+    def __init__(self, name, topics,
+                loop_rate_hz=1,
+                qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST)):
+        super(TopicObserver, self).__init__(name, qos_profile, loop_rate_hz)
+
+        subscribers = []
+        for topic, topic_type in topics:
+            sub = Subscriber(self, topic_type, topic)
+            subscribers.append(sub)
+        topic_synchronizer = ApproximateTimeSynchronizer(
+            subscribers,
+            5,  # queue size
+            0.2,  # time
+            allow_headerless=True)
+        topic_synchronizer.registerCallback(self.callback)
+
+    def callback(self, msg1, msg2):
+        print(str(msg1) + " " + str(msg2))
+
+    def generate_diagnostics(self) -> t.List[DiagnosticStatus]:
+        msg = []
+        msg.append(DiagnosticStatus())
+        return msg
 
 # TODO: delete later -- for test only
 def main(args=None) -> None:
