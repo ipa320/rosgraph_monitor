@@ -28,7 +28,7 @@ class ROSGraphObserver(Observer):
             print(e.args)
             return status_msgs
 
-        missing_interfaces, additional_interfaces, incorrect_params = self.compare_models(
+        missing_interfaces, additional_interfaces, incorrect_params = compare_rossystem_models(
             self.static_model, dynamic_model)
 
         status_msgs = list()
