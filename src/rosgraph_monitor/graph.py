@@ -127,7 +127,10 @@ def create_ros_graph_snapshot():
                 continue
             if node not in components:
                 _init_node_dict(components, node)
-            components[node]['service_servers'][serv] = rosservice.get_service_type(serv)
+            try:
+                components[node]['service_servers'][serv] = rosservice.get_service_type(serv)
+            except rosservice.ROSServiceIOException as e:
+                pass
 
     for name in components:
         publishers = components[name]['publishers']
@@ -150,7 +153,7 @@ def create_ros_graph_snapshot():
         for param in param_node_ns:
             if param not in BLACK_LIST_PARAM and not(param.startswith('/roslaunch')):
                 p = master.getParam(param)
-                components[node]['parameters'][param] = [p, type(p)]
+                components[name]['parameters'][param] = [p, type(p)]
     # the remaining params are global params
     if len(params) > 0:
         components['global_parameters'] = dict()
