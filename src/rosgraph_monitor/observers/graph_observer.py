@@ -15,14 +15,14 @@ class ROSGraphObserver(Observer):
         except KeyError as exc:
             raise exc
         self.static_model = RosSystemModelParser(model_path).parse()
-        self.generator = RosSystemModelGenerator('demo')
 
     def generate_diagnostics(self):
         status_msgs = list()
 
         components = create_ros_graph_snapshot()
         try:
-            model_str = self.generator.create_ros_system_model_list(components)[1]
+            generator = RosSystemModelGenerator('demo')
+            model_str = generator.create_ros_system_model_list(components)[1]
             dynamic_model = RosSystemModelParser(model_str, isFile=False).parse()
         except Exception as e:
             print(e.args)
