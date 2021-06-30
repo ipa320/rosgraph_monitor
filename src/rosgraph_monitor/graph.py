@@ -57,7 +57,10 @@ def _check_actions(publishers, subscribers, action_clients, action_servers):
                         continue
                     remove_subs.append(topic)
                 _action_type = topic_type[:-10]  # Hardcoded ActionGoal
-                action_clients.add((_action_name, _action_type))
+                if _action_name not in action_clients.keys():
+                    action_clients[_action_name] = [_action_type]
+                else:
+                    action_clients[_action_name].append(_action_type)
 
         # Check Action Server
         for topic_name, topic_type in subscribers.items():
