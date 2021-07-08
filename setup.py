@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'observer = rosgraph_monitor.observer:main'
+            'observer = rosgraph_monitor.observer:main',
+            'graph_observer = rosgraph_monitor.observers.graph_observer:main'
         ],
     },
 )

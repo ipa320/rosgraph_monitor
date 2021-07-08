@@ -4,9 +4,14 @@ import typing as t
 import rclpy
 from rclpy.qos import QoSProfile, HistoryPolicy
 from rclpy.node import Node
+from rclpy.task import Future
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
+from std_msgs.msg import Int32
+from message_filters import ApproximateTimeSynchronizer, Subscriber
+
 
 # TODO: not sure if it should extend Node
+# Meaning, does every observer has to be a separate node?
 class Observer(Node):
     def __init__(self, name, 
                 qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST),
@@ -62,12 +67,59 @@ class Observer(Node):
         self._lock.release()
         return isSet
 
+
+class TopicObserver(Observer):
+    def __init__(self, name, topics,
+                loop_rate_hz=1,
+                qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST)):
+        super(TopicObserver, self).__init__(name, qos_profile, loop_rate_hz)
+
+        subscribers = []
+        for topic, topic_type in topics:
+            sub = Subscriber(self, topic_type, topic)
+            subscribers.append(sub)
+        topic_synchronizer = ApproximateTimeSynchronizer(
+            subscribers,
+            queue_size=5,
+            slop=5,
+            allow_headerless=True)
+        topic_synchronizer.registerCallback(self.generate_diagnostics)
+
+    # Example -- Every TopicObserver has to implement this function in a similar fashion
+    def calculate_attr(self, future, msg1, msg2):
+        res = msg1.data + msg2.data     # custom logic
+
+        status_msg = DiagnosticStatus()
+        status_msg.level = DiagnosticStatus.OK
+        status_msg.name = "Dummy Node"
+        status_msg.message = "QA status"
+
+        future.set_result(status_msg)
+
+    def publish_diagnostics(self, status_msg: DiagnosticStatus):
+        diag_msg = DiagnosticArray()
+
+        diag_msg.status = [status_msg]
+
+        diag_msg.header.stamp = self._clock.now().to_msg()
+        self._pub_diag.publish(diag_msg)
+
+    def generate_diagnostics(self, *msgs) -> t.List[DiagnosticStatus]:
+        future = Future()
+        future.add_done_callback(lambda future : self.publish_diagnostics(future.result()))
+        self.calculate_attr(future, *msgs)
+
+    def start(self) -> None:
+        self._logger.info("starting {}...".format(self.get_name()))
+
+
 # TODO: delete later -- for test only
 def main(args=None) -> None:
     rclpy.init(args=args)
     
-    observer = Observer("Dummy")
-    observer.start()
+    topics = [("/speed", Int32), ("/accel", Int32)]
+    observer = TopicObserver("Dummy", topics)
+
     try:
         rclpy.spin(observer)
     except KeyboardInterrupt:
