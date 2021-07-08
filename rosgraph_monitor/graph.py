@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rosgraph_monitor.parameters_helper import *
 from re import compile
 
 
@@ -20,6 +21,13 @@ def _init_node_dict(nodes, name):
                    'service_clients' :dict(),
                    'action_servers' :dict(),
                    'action_clients' : dict() }
+
+def _get_parameter_names_by_node(this_node: Node, node_name: str):
+    param_names = call_list_parameters(this_node, node_name)
+    response = call_get_parameters(this_node, node_name, param_names)
+    param_values = [[get_value(x) for x in response.values]]
+    parameters = dict(zip(param_names, param_values))
+    return parameters
 
 def create_ros_graph_snapshot(graph_node: Node):
     components = dict()
@@ -43,8 +51,7 @@ def create_ros_graph_snapshot(graph_node: Node):
         for srv in srvs:
             components[node_name]['service_servers'][srv[0]] = srv[1][0]
 
-        # TODO: for parameters
-        # https://github.com/ros2/ros2cli/blob/c00dec0a72c049d3a4a8a80f1324ea24dc8373c6/ros2param/ros2param/api/__init__.py#L122
-        # https://answers.ros.org/question/340600/how-to-get-ros2-parameter-hosted-by-another-node/
+        parameters = _get_parameter_names_by_node(graph_node, node_name)
+        components[node_name]['parameters'] = parameters
 
     return components
