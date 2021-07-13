@@ -4,16 +4,18 @@ import os
 import rospkg
 import rospy
 from ros_model_generator.rossystem_generator import RosSystemModelGenerator
+from ros_model_generator.rosmodel_generator import RosModelGenerator
 from rosgraph_monitor.observers.graph_observer import create_ros_graph_snapshot
 
 r = rospkg.RosPack()
 
 def generate_model_from_snapshot():
-    file_path = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.rossystem")
+    rossystem_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.rossystem")
+    rosmodel_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.ros")
     components = create_ros_graph_snapshot()
-    generator = RosSystemModelGenerator('demo')
+    rossystem_generator = RosSystemModelGenerator('demo', 'my_ros_pkg')
     try:
-        generator.dump_ros_system_model_list(components, file_path)
+        rossystem_generator.generate_ros_system_model_list(components, rossystem_file, rosmodel_file)
     except Exception as e:
         print(e.args)
 
