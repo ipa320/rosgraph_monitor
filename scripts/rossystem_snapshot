@@ -13,8 +13,8 @@ def generate_model_from_snapshot():
     rossystem_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.rossystem")
     rosmodel_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.ros")
     components = create_ros_graph_snapshot()
+    rossystem_generator = RosSystemModelGenerator('demo', 'my_ros_pkg')
     print(components)
-    rossystem_generator = RosSystemModelGenerator('demo')
     rosmodel_generator = RosModelGenerator()
     try:
         rossystem_generator.dump_ros_system_model_list(components, rossystem_file)
