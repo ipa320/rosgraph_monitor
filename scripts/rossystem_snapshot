@@ -14,7 +14,6 @@ def generate_model_from_snapshot():
     rosmodel_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.ros")
     components = create_ros_graph_snapshot()
     rossystem_generator = RosSystemModelGenerator('demo', 'my_ros_pkg')
-    print(components)
     try:
         rossystem_generator.generate_ros_system_model_list(components, rossystem_file, rosmodel_file)
     except Exception as e:
