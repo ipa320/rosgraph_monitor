@@ -46,6 +46,9 @@ def _check_actions(publishers, subscribers, services, action_clients, action_ser
     for pub in pubs_:
         if '/_action/' in pub:
             publishers.pop(pub)
+    for sub in subs_:
+        if '/_action/' in sub:
+            subscribers.pop(sub)
 
 def create_ros_graph_snapshot(graph_node: Node):
     components = dict()
