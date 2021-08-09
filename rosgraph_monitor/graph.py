@@ -9,8 +9,8 @@ BLACK_LIST_TOPIC = ["/tf", "/tf_static", "/rosout", "/clock", "/parameter_events
 BLACK_LIST_SERV = ["describe_parameters", "get_parameter_types", "get_parameters", "list_parameters", "set_parameters", "set_parameters_atomically"]
 BLACK_LIST_NODE = ["rosout", "_ros2cli_daemon_0"]
 
-ACTION_FILTER = ['goal', 'cancel']
-ACTION_FILTER2 = ['status', 'result', 'feedback']
+ACTION_FILTER = ['send_goal', 'cancel_goal', 'get_result']
+ACTION_FILTER2 = ['status', 'feedback']
 
 
 def _init_node_dict(nodes, name):
@@ -28,6 +28,25 @@ def _get_parameter_names_by_node(this_node: Node, node_name: str):
     param_values = [[get_value(x) for x in response.values]]
     parameters = dict(zip(param_names, param_values))
     return parameters
+
+def _check_actions(publishers, subscribers, services, action_clients, action_servers):
+    pubs_ = [pub for pub in publishers.keys()]
+    subs_ = [sub for sub in subscribers.keys()]
+    srvs_ = [srv for srv in services.keys()]
+
+    # Check Action Server
+    actions = set()
+    for srv in srvs_:
+        if (ACTION_FILTER[0] in srv) or (ACTION_FILTER[1] in srv) or (ACTION_FILTER[2] in srv) and '/_action/' in srv:
+            action_name = '/' + srv.split('/')[1]
+            actions.add(action_name)   # assuming the name starts with '/' - is that always the case?
+            if action_name not in action_servers.keys() and services[srv].endswith('_SendGoal'):
+                action_servers[action_name] = services[srv].partition('_SendGoal')[0]
+            services.pop(srv)
+
+    for pub in pubs_:
+        if pub.startswith(tuple(actions)):
+            publishers.pop(pub)
 
 def create_ros_graph_snapshot(graph_node: Node):
     components = dict()
@@ -59,5 +78,12 @@ def create_ros_graph_snapshot(graph_node: Node):
 
         parameters = _get_parameter_names_by_node(graph_node, node_name)
         components[node_name]['parameters'] = parameters
+
+        publishers = components[node_name]['publishers']
+        subscribers = components[node_name]['subscribers']
+        services = components[node_name]['service_servers']
+        action_clients = components[node_name]['action_clients']
+        action_servers = components[node_name]['action_servers']
+        _check_actions(publishers, subscribers, services, action_clients, action_servers)
 
     return components
