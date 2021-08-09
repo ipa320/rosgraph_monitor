@@ -35,17 +35,16 @@ def _check_actions(publishers, subscribers, services, action_clients, action_ser
     srvs_ = [srv for srv in services.keys()]
 
     # Check Action Server
-    actions = set()
     for srv in srvs_:
         if (ACTION_FILTER[0] in srv) or (ACTION_FILTER[1] in srv) or (ACTION_FILTER[2] in srv) and '/_action/' in srv:
             action_name = '/' + srv.split('/')[1]
-            actions.add(action_name)   # assuming the name starts with '/' - is that always the case?
             if action_name not in action_servers.keys() and services[srv].endswith('_SendGoal'):
-                action_servers[action_name] = services[srv].partition('_SendGoal')[0]
+                if any(action_name in pub for pub in pubs_):
+                    action_servers[action_name] = services[srv].partition('_SendGoal')[0]
             services.pop(srv)
 
     for pub in pubs_:
-        if pub.startswith(tuple(actions)):
+        if '/_action/' in pub:
             publishers.pop(pub)
 
 def create_ros_graph_snapshot(graph_node: Node):
