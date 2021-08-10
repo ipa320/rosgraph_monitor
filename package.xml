@@ -13,9 +13,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   
-  <exec_depend>controller_manager_msgs</exec_depend>
   <exec_depend>diagnostic_msgs</exec_depend>
   <exec_depend>ros_model_parser</exec_depend>
+  <exec_depend>rosservice</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-rospkg</exec_depend>
   <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-rospkg</exec_depend>
 
