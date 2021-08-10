@@ -1,4 +1,5 @@
 from pyparsing import *
+from diagnostic_msgs.msg import DiagnosticStatus, KeyValue
 
 
 def strip_slash(string):
@@ -54,3 +55,41 @@ def compare_rossystem_models(model_ref, model_current):
 
     # returning missing_interfaces, additional_interfaces
     return list(set_ref - set_current), list(set_current - set_ref), incorrect_params
+
+
+def get_status_msgs(missing_interfaces, additional_interfaces, incorrect_params):
+    status_msgs = list()
+    if (not missing_interfaces) & (not missing_interfaces) & (not missing_interfaces):
+        status_msg = DiagnosticStatus()
+        status_msg.level = DiagnosticStatus.OK
+        status_msg.name = "ROS Graph"
+        status_msg.message = "running OK"
+        status_msgs.append(status_msg)
+
+    else:
+        # Here are 2 'for loops' - 1 for missing and 1 for additional
+        for interface in missing_interfaces:
+            status_msg = DiagnosticStatus()
+            status_msg.level = DiagnosticStatus.ERROR
+            status_msg.name = interface
+            status_msg.message = "Missing node"
+            status_msgs.append(status_msg)
+
+        for interface in additional_interfaces:
+            status_msg = DiagnosticStatus()
+            status_msg.level = DiagnosticStatus.WARN
+            status_msg.name = interface
+            status_msg.message = "Additional node"
+            status_msgs.append(status_msg)
+
+        for interface in incorrect_params:
+            status_msg = DiagnosticStatus()
+            status_msg.level = DiagnosticStatus.ERROR
+            status_msg.name = interface
+            status_msg.message = "Wrong param configuration"
+            for params in incorrect_params[interface]:
+                status_msg.values.append(
+                    KeyValue(params[0], str(params[1])))
+            status_msgs.append(status_msg)
+
+    return status_msgs
