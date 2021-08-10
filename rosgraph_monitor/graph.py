@@ -25,7 +25,7 @@ def _init_node_dict(nodes, name):
 def _get_parameter_names_by_node(this_node: Node, node_name: str):
     param_names = call_list_parameters(this_node, node_name)
     response = call_get_parameters(this_node, node_name, param_names)
-    param_values = [[get_value(x) for x in response.values]]
+    param_values = [get_value_and_type(x) for x in response.values]
     parameters = dict(zip(param_names, param_values))
     return parameters
 

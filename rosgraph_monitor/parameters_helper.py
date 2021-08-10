@@ -52,6 +52,9 @@ def get_value(parameter_value):
 
     return value
 
+def get_value_and_type(parameter_value):
+    value = get_value(parameter_value)
+    return [value, type(value)]
 
 def get_parameter_value(string_value):
     """Guess the desired type of the parameter based on the string value."""
