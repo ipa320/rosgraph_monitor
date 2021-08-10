@@ -3,22 +3,32 @@
 import os
 import rospkg
 import rospy
+import sys
 from ros_model_generator.rossystem_generator import RosSystemModelGenerator
 from ros_model_generator.rosmodel_generator import RosModelGenerator
 from rosgraph_monitor.observers.graph_observer import create_ros_graph_snapshot
 
 r = rospkg.RosPack()
 
-def generate_model_from_snapshot():
-    rossystem_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.rossystem")
-    rosmodel_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/test.ros")
+def generate_model_from_snapshot(system_name):
+    rossystem_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/"+system_name+".rossystem")
+    rosmodel_file = os.path.join(r.get_path('rosgraph_monitor'), "resources/"+system_name+".ros")
     components = create_ros_graph_snapshot()
-    rossystem_generator = RosSystemModelGenerator('demo', 'my_ros_pkg')
+    rossystem_generator = RosSystemModelGenerator(system_name, system_name+'_pkg')
     try:
         rossystem_generator.generate_ros_system_model_list(components, rossystem_file, rosmodel_file, print_param_value=False)
+        print("The analysis has been completed successfully, the result has been saved in:")
+        print(rossystem_file)
+        print(rosmodel_file)
     except Exception as e:
         print(e.args)
 
 if __name__ == "__main__":
+    system_name = "test"
+    if len(sys.argv) < 2:
+      print(" ~~~~ \n System name not specified, by default it will be called 'test'. \n To set a name to the system please give the string as argument, i.e.: \n   rosrun rosgraph_monitor rossystem_snapshot SystemName \n ~~~~")
+    else:
+      system_name = sys.argv[1]
+       
     rospy.init_node('rossystem_from_snapshot_generator')
-    generate_model_from_snapshot()
+    generate_model_from_snapshot(system_name)
