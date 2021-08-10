@@ -2,11 +2,12 @@ from rosgraph_monitor.observer import Observer
 from ros_model_parser.ros_model_parser.rossystem_parser import RosSystemModelParser
 from ros_model_parser.ros_model_generator.rossystem_generator import RosSystemModelGenerator
 from rosgraph_monitor.graph import create_ros_graph_snapshot
-# from rosgraph_monitor.model import compare_rossystem_models
+from rosgraph_monitor.model import compare_rossystem_models, get_status_msgs
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 # to be deleted
 import rclpy
+import os
 
 
 class ROSGraphObserver(Observer):
@@ -28,7 +29,12 @@ class ROSGraphObserver(Observer):
         except Exception as e:
             print(e.args)
             return status_msgs
+
+        missing_interfaces, additional_interfaces, incorrect_params = compare_rossystem_models(
+            self.static_model, dynamic_model)
         
+        status_msgs = get_status_msgs(missing_interfaces, additional_interfaces, incorrect_params)
+        return status_msgs
 
 # TODO: delete later -- for test only
 def main(args=None) -> None:
