@@ -2,7 +2,7 @@ from rosgraph_monitor.observer import Observer
 from ros_model_parser.rossystem_parser import RosSystemModelParser
 from ros_model_generator.rossystem_generator import RosSystemModelGenerator
 from rosgraph_monitor.graph import create_ros_graph_snapshot, get_param
-from rosgraph_monitor.model import compare_rossystem_models
+from ros_model_parser.model_comparator import compare_rossystem_models
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 
