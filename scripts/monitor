@@ -8,6 +8,7 @@ import pkgutil
 
 import rospy
 import rosgraph_monitor.observers
+from controller_manager_msgs.srv import *
 
 
 def iter_namespace(ns_pkg):
