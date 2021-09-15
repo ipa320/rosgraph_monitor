@@ -40,11 +40,10 @@ class ROSGraphObserver(Observer):
 def main(args=None) -> None:
     rclpy.init(args=args)
     node = ROSGraphObserver('rosgraph_observer')
+    node.start()
 
     try:
-        while rclpy.ok():
-            print(node.generate_diagnostics())
-            rclpy.spin_once(node)
+        rclpy.spin(node)
     except KeyboardInterrupt:
         node.destroy_node()
         rclpy.shutdown()
