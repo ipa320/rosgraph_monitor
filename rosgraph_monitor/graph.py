@@ -78,8 +78,10 @@ def create_ros_graph_snapshot(graph_node: Node):
             if not srv[0].endswith(tuple(BLACK_LIST_SERV)):
                 components[node_name]['service_servers'][srv[0]] = srv[1][0]
 
-        parameters = _get_parameter_names_by_node(graph_node, node_name)
-        components[node_name]['parameters'] = parameters
+        # the service 'list_parameters' times out causing a runtime exception
+        # will debug the issue later
+        # parameters = _get_parameter_names_by_node(graph_node, node_name)
+        # components[node_name]['parameters'] = parameters
 
         publishers = components[node_name]['publishers']
         subscribers = components[node_name]['subscribers']
