@@ -1,5 +1,6 @@
 from pyparsing import *
 from diagnostic_msgs.msg import DiagnosticStatus, KeyValue
+import re
 
 
 def strip_slash(string):
