@@ -1,4 +1,4 @@
-from pyparsing import *
+from pyparsing import ParseResults
 from diagnostic_msgs.msg import DiagnosticStatus, KeyValue
 import re
 

@@ -1,4 +1,3 @@
-import rclpy
 from rclpy.node import Node
 from rosgraph_monitor.parameters_helper import call_list_parameters, call_get_parameters, get_value_and_type
 from re import compile

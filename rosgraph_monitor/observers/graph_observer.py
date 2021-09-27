@@ -3,7 +3,6 @@ from ros_model_parser.ros_model_parser.rossystem_parser import RosSystemModelPar
 from ros_model_parser.ros_model_generator.rossystem_generator import RosSystemModelGenerator
 from rosgraph_monitor.graph import create_ros_graph_snapshot
 from rosgraph_monitor.model import compare_rossystem_models, get_status_msgs
-from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 
 # to be deleted
 import rclpy

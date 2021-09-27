@@ -13,18 +13,13 @@
 # limitations under the License.
 
 from rcl_interfaces.msg import ParameterType
-from rcl_interfaces.msg import ParameterValue
-from rcl_interfaces.srv import DescribeParameters
 from rcl_interfaces.srv import GetParameters
 from rcl_interfaces.srv import ListParameters
-from rcl_interfaces.srv import SetParameters
 import rclpy
-from ros2cli.node.direct import DirectNode
-import yaml
+
 
 # this file is cloned from
 # https://github.com/ros2/ros2cli/blob/c00dec0a72c049d3a4a8a80f1324ea24dc8373c6/ros2param/ros2param/api/__init__.py
-
 def get_value(parameter_value):
     """Get the value from a ParameterValue."""
     if parameter_value.type == ParameterType.PARAMETER_BOOL:
@@ -51,6 +46,7 @@ def get_value(parameter_value):
         value = None
 
     return value
+
 
 def get_value_and_type(parameter_value):
     value = get_value(parameter_value)
@@ -106,4 +102,3 @@ def call_list_parameters(node, node_name, prefix=None):
             "Exception while calling service of node '{node_name}': {e}"
             .format_map(locals()))
     return response.result.names
-
