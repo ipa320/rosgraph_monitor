@@ -5,9 +5,9 @@ from rosgraph_monitor.parameters_helper import call_list_parameters, \
 
 BLACK_LIST_PARAM = ['/rosdistro', '/rosversion', '/run_id']
 BLACK_LIST_TOPIC = ["/tf", "/tf_static", "/rosout", "/clock", "/parameter_events",
-    "/diagnostics"]
+                    "/diagnostics"]
 BLACK_LIST_SERV = ["describe_parameters", "get_parameter_types", "get_parameters",
-    "list_parameters", "set_parameters", "set_parameters_atomically"]
+                   "list_parameters", "set_parameters", "set_parameters_atomically"]
 BLACK_LIST_NODE = ["rosout", "_ros2cli_daemon_0"]
 
 ACTION_FILTER = ['send_goal', 'cancel_goal', 'get_result']
@@ -40,7 +40,7 @@ def _check_actions(publishers, subscribers, services, action_clients, action_ser
     # Check Action Server
     for srv in srvs_:
         if (ACTION_FILTER[0] in srv) or (ACTION_FILTER[1] in srv) or (ACTION_FILTER[2] in srv) \
-            and '/_action/' in srv:
+                and '/_action/' in srv:
             action_name = '/' + srv.split('/')[1]
             if action_name not in action_servers.keys() and services[srv].endswith('_SendGoal'):
                 if any(action_name in pub for pub in pubs_):
@@ -53,6 +53,7 @@ def _check_actions(publishers, subscribers, services, action_clients, action_ser
     for sub in subs_:
         if '/_action/' in sub:
             subscribers.pop(sub)
+
 
 def create_ros_graph_snapshot(graph_node: Node):
     components = dict()

@@ -14,8 +14,8 @@ from message_filters import ApproximateTimeSynchronizer, Subscriber
 # Meaning, does every observer has to be a separate node?
 class Observer(Node):
     def __init__(self, name,
-        qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST),
-        loop_rate_hz=1):
+                 qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST),
+                 loop_rate_hz=1):
         super(Observer, self).__init__(name)
         self._rate = self.create_rate(loop_rate_hz)
         self._logger = self.get_logger()
@@ -70,8 +70,8 @@ class Observer(Node):
 
 class TopicObserver(Observer):
     def __init__(self, name, topics,
-        loop_rate_hz=1,
-        qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST)):
+                 loop_rate_hz=1,
+                 qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST)):
         super(TopicObserver, self).__init__(name, qos_profile, loop_rate_hz)
 
         subscribers = []

@@ -12,9 +12,9 @@ def strip_slash(string):
 def compare_rossystem_models(model_ref, model_current):
     # not sure of the performance of this method
     set_ref = set((strip_slash(x.interface_name[0]))
-                    for x in model_ref.interfaces)
+                  for x in model_ref.interfaces)
     set_current = set((strip_slash(x.interface_name[0]))
-                        for x in model_current.interfaces)
+                      for x in model_current.interfaces)
 
     # similarly for all interfaces within the node?
     # or only for topic connections?
@@ -24,7 +24,7 @@ def compare_rossystem_models(model_ref, model_current):
         for param in interface.parameters:
             key = strip_slash(param.param_name[0])
             ref_params[key] = [param.param_value[0],
-                                interface.interface_name[0]]
+                               interface.interface_name[0]]
 
     current_params = dict()
     for interface in model_current.interfaces:
