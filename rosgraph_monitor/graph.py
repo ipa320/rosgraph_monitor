@@ -1,11 +1,14 @@
 from rclpy.node import Node
-from rosgraph_monitor.parameters_helper import call_list_parameters, call_get_parameters, get_value_and_type
+from rosgraph_monitor.parameters_helper import call_list_parameters, \
+    call_get_parameters, get_value_and_type
 from re import compile
 
 
 BLACK_LIST_PARAM = ['/rosdistro', '/rosversion', '/run_id']
-BLACK_LIST_TOPIC = ["/tf", "/tf_static", "/rosout", "/clock", "/parameter_events", "/diagnostics"]
-BLACK_LIST_SERV = ["describe_parameters", "get_parameter_types", "get_parameters", "list_parameters", "set_parameters", "set_parameters_atomically"]
+BLACK_LIST_TOPIC = ["/tf", "/tf_static", "/rosout", "/clock", "/parameter_events",
+    "/diagnostics"]
+BLACK_LIST_SERV = ["describe_parameters", "get_parameter_types", "get_parameters",
+    "list_parameters", "set_parameters", "set_parameters_atomically"]
 BLACK_LIST_NODE = ["rosout", "_ros2cli_daemon_0"]
 
 ACTION_FILTER = ['send_goal', 'cancel_goal', 'get_result']
@@ -13,13 +16,14 @@ ACTION_FILTER2 = ['status', 'feedback']
 
 
 def _init_node_dict(nodes, name):
-    nodes[name] = {'parameters' : dict(),
-                   'publishers' : dict(),
-                   'subscribers' : dict(),
-                   'service_servers' : dict(),
-                   'service_clients' :dict(),
-                   'action_servers' :dict(),
-                   'action_clients' : dict() }
+    nodes[name] = {'parameters': dict(),
+                   'publishers': dict(),
+                   'subscribers': dict(),
+                   'service_servers': dict(),
+                   'service_clients': dict(),
+                   'action_servers': dict(),
+                   'action_clients': dict()}
+
 
 def _get_parameter_names_by_node(this_node: Node, node_name: str):
     param_names = call_list_parameters(this_node, node_name)
@@ -28,6 +32,7 @@ def _get_parameter_names_by_node(this_node: Node, node_name: str):
     parameters = dict(zip(param_names, param_values))
     return parameters
 
+
 def _check_actions(publishers, subscribers, services, action_clients, action_servers):
     pubs_ = [pub for pub in publishers.keys()]
     subs_ = [sub for sub in subscribers.keys()]
@@ -35,7 +40,8 @@ def _check_actions(publishers, subscribers, services, action_clients, action_ser
 
     # Check Action Server
     for srv in srvs_:
-        if (ACTION_FILTER[0] in srv) or (ACTION_FILTER[1] in srv) or (ACTION_FILTER[2] in srv) and '/_action/' in srv:
+        if (ACTION_FILTER[0] in srv) or (ACTION_FILTER[1] in srv) or (ACTION_FILTER[2] in srv) \
+            and '/_action/' in srv:
             action_name = '/' + srv.split('/')[1]
             if action_name not in action_servers.keys() and services[srv].endswith('_SendGoal'):
                 if any(action_name in pub for pub in pubs_):

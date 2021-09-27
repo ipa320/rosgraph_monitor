@@ -116,7 +116,7 @@ class TopicObserver(Observer):
 # TODO: delete later -- for test only
 def main(args=None) -> None:
     rclpy.init(args=args)
-    
+
     topics = [("/speed", Int32), ("/accel", Int32)]
     observer = TopicObserver("Dummy", topics)
 

@@ -6,6 +6,7 @@ import re
 def strip_slash(string):
     return '{}'.format(string[1:] if string.startswith('/') else string)
 
+
 # find out missing and additional interfaces
 # if both lists are empty, system is running fine
 def compare_rossystem_models(model_ref, model_current):
@@ -49,8 +50,7 @@ def compare_rossystem_models(model_ref, model_current):
             isEqual = current_value == ref_value
             if not isEqual:
                 incorrect_params.setdefault(current_params[key][1], [])
-                incorrect_params[current_params[key]
-                    [1]].append([key, current_value])
+                incorrect_params[current_params[key][1]].append([key, current_value])
         except Exception:
             pass
 
