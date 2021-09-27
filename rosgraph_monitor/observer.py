@@ -87,7 +87,7 @@ class TopicObserver(Observer):
 
     # Example -- Every TopicObserver has to implement this function in a similar fashion
     def calculate_attr(self, future, msg1, msg2):
-        res = msg1.data + msg2.data     # custom logic
+        _ = msg1.data + msg2.data     # custom logic
 
         status_msg = DiagnosticStatus()
         status_msg.level = DiagnosticStatus.OK
