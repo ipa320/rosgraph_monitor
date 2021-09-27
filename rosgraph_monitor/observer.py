@@ -13,9 +13,9 @@ from message_filters import ApproximateTimeSynchronizer, Subscriber
 # TODO: not sure if it should extend Node
 # Meaning, does every observer has to be a separate node?
 class Observer(Node):
-    def __init__(self, name, 
-                qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST),
-                loop_rate_hz=1):
+    def __init__(self, name,
+        qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST),
+        loop_rate_hz=1):
         super(Observer, self).__init__(name)
         self._rate = self.create_rate(loop_rate_hz)
         self._logger = self.get_logger()
@@ -43,7 +43,7 @@ class Observer(Node):
         self._logger.info("starting loop")
         while rclpy.ok() and not self._stopped():
             diag_msg = DiagnosticArray()
-            
+
             status_msgs = self.generate_diagnostics()
             diag_msg.status.extend(status_msgs)
 
@@ -70,8 +70,8 @@ class Observer(Node):
 
 class TopicObserver(Observer):
     def __init__(self, name, topics,
-                loop_rate_hz=1,
-                qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST)):
+        loop_rate_hz=1,
+        qos_profile=QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST)):
         super(TopicObserver, self).__init__(name, qos_profile, loop_rate_hz)
 
         subscribers = []
@@ -106,7 +106,7 @@ class TopicObserver(Observer):
 
     def generate_diagnostics(self, *msgs) -> t.List[DiagnosticStatus]:
         future = Future()
-        future.add_done_callback(lambda future : self.publish_diagnostics(future.result()))
+        future.add_done_callback(lambda future: self.publish_diagnostics(future.result()))
         self.calculate_attr(future, *msgs)
 
     def start(self) -> None:
@@ -125,6 +125,7 @@ def main(args=None) -> None:
     except KeyboardInterrupt:
         observer.destroy_node()
         rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

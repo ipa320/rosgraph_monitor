@@ -50,8 +50,8 @@ def compare_rossystem_models(model_ref, model_current):
             if not isEqual:
                 incorrect_params.setdefault(current_params[key][1], [])
                 incorrect_params[current_params[key]
-                                    [1]].append([key, current_value])
-        except Exception as exc:
+                    [1]].append([key, current_value])
+        except Exception:
             pass
 
     # returning missing_interfaces, additional_interfaces

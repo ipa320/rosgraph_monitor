@@ -32,9 +32,10 @@ class ROSGraphObserver(Observer):
 
         missing_interfaces, additional_interfaces, incorrect_params = compare_rossystem_models(
             self.static_model, dynamic_model)
-        
+
         status_msgs = get_status_msgs(missing_interfaces, additional_interfaces, incorrect_params)
         return status_msgs
+
 
 # TODO: delete later -- for test only
 def main(args=None) -> None:
@@ -47,6 +48,7 @@ def main(args=None) -> None:
     except KeyboardInterrupt:
         node.destroy_node()
         rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
