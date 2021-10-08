@@ -2,27 +2,36 @@
 
 ## Installation
 ```
-$ cd <path/to/workspace/src> git clone -b observers https://github.com/ipa-hsd/rosgraph_monitor/
-$ cd <path/to/workspace/src> git clone -b SoSymPaper https://github.com/ipa-nhg/ros_graph_parser
-$ cd <path/to/workspace>
-$ source /opt/ros/melodic/setup.bash
-$ rosdep install --from-paths src --ignore-src -r -y
-$ catkin build 
-$ source <path/to/workspace/devel/>setup.bash
+mkdir ~/model_ws && cd ~/model_ws
+wget https://raw.githubusercontent.com/ipa-hsd/rosgraph_monitor/foxy-devel/.rosinstall
+vcs import src < .rosinstall
+source /opt/ros/foxy/setup.bash
+rosdep update && rosdep install --from-paths src -y -i -r
+colcon build
+```
+## Usage
+
+### ROS system diagnostics
+To generate rossystem model from the ROS graph and to compare it with a desired system, launch a system of choice:
+
+Start the `rosgraph_monitor` and listen to `/diagnostics` topic  
+(`source ~/model_ws/install/setup.bash` on each new terminal)
+```
+# Terminal 1:
+ros2 run rosgraph_monitor graph_observer.py
+
+#Terminal 2:
+ros2 topic echo /diagnostics
 ```
 
-## Running the system  
-source the workspace in all the terminals
-
+### Property observer
+To use a custom created property observer in the module `observers` (e.g. `QualityObserver`)
+Note: Currently a dummy observer has been implemented in `observer.py`
 ```
-# Terminal 1
-$ roscore
+# Terminal 1:
+ros2 run rosgraph_monitor observer.py
 
-# Terminal 2
-$ rosrun rosgraph_monitor monitor
-
-# Publish the topics listed in the `QualityObserver`
-
-# In a new terminal 
-$ rosservice call /load_observer "name: 'QualityObserver'"
+#Terminal 2:
+ros2 topic echo /diagnostics
 ```
+

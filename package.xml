@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rosgraph_monitor</name>
   <version>0.0.1</version>
@@ -10,6 +12,8 @@
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>diagnostic_msgs</exec_depend>
+  <exec_depend>message_filters</exec_depend>
+  <exec_depend>ros_model_parser</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

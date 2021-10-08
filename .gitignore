@@ -1,3 +1,21 @@
+# VI/VIM
+*.swp
+
+# python files
+*.pcd
 *.pyc
-__pycache__
-.vscode
+*.pco
+
+# temporary files
+*~
+
+# merge conflict files
+*.orig
+*BACKUP*
+*BASE*
+*LOCAL*
+*REMOTE*
+
+# Catkin custom files
+CATKIN_IGNORE
+
